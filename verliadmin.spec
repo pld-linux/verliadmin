@@ -1,13 +1,14 @@
-%define		subver RC2
+%define		subver RC3
 Summary:	PHP interface for verlihub
 Summary(pl):	Interfejs php dla verlihub
 Name:		verliadmin
 Version:	0.3
 Release:	1.%{subver}
+Epoch:		1
 License:	GPL
 Group:		Networking/Admin
 Source0:	http://bohyn.czechweb.cz/download/VerliAdmin_%{version}_%{subver}.zip
-# Source0-md5:	7df9d5ba542d5a35f893b2c6e9d2a316
+# Source0-md5:	efb8c1a2e89c3d2652e184931ca273af
 URL:		http://bohyn.czechweb.cz/
 BuildRequires:	unzip
 Requires:	verlihub = 0.9.7
