@@ -1,6 +1,6 @@
 %define		subver RC3
 Summary:	PHP interface for verlihub
-Summary(pl):	Interfejs php dla verlihub
+Summary(pl):	Interfejs PHP dla verlihub
 Name:		verliadmin
 Version:	0.3
 Release:	0.%{subver}.1
