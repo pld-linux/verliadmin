@@ -43,6 +43,8 @@ rm -rf ../VERLIADMIN
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT%{_httpdir}/verliadmin/{img,language,logs}
 
+install favicon.ico $RPM_BUILD_ROOT%{_httpdir}/verliadmin
+install default.css $RPM_BUILD_ROOT%{_httpdir}/verliadmin
 install *.php $RPM_BUILD_ROOT%{_httpdir}/verliadmin
 install img/* $RPM_BUILD_ROOT%{_httpdir}/verliadmin/img
 install language/* $RPM_BUILD_ROOT%{_httpdir}/verliadmin/language
@@ -57,7 +59,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_httpdir}/verliadmin/img
 %{_httpdir}/verliadmin/language
 %{_httpdir}/verliadmin/logs
-%{_httpdir}/verliadmin/[abdefhiklmrsuv]*.php
+%{_httpdir}/verliadmin/[abdefhiklmrsuv]*.*
 %{_httpdir}/verliadmin/commands.php
 %{_httpdir}/verliadmin/chpass.php
 %attr(640,root,http) %verify(not md5 size mtime) %config(noreplace) %{_httpdir}/verliadmin/config.php
