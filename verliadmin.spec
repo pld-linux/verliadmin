@@ -48,7 +48,7 @@ install language/* $RPM_BUILD_ROOT%{_verliadmindir}/language
 ln -sf %{_sysconfdir}/verliadmin/config.php $RPM_BUILD_ROOT%{_verliadmindir}/config.php
 
 # for apache
-echo "Alias /verliadmin /usr/share/%{name}" >apache-%{name}.conf
+echo "Alias /verliadmin /usr/share/%{name}" > apache-%{name}.conf
 install apache-%{name}.conf $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
 
 %clean
@@ -57,35 +57,35 @@ rm -rf $RPM_BUILD_ROOT
 %post
 # apache1
 if [ -d %{_apache1dir}/conf.d ]; then
-        ln -sf %{_sysconfdir}/%{name}/apache-%{name}.conf %{_apache1dir}/conf.d/99_%{name}.conf
-        if [ -f /var/lock/subsys/apache ]; then
-                /etc/rc.d/init.d/apache restart 1>&2
-        fi
+	ln -sf %{_sysconfdir}/%{name}/apache-%{name}.conf %{_apache1dir}/conf.d/99_%{name}.conf
+	if [ -f /var/lock/subsys/apache ]; then
+		/etc/rc.d/init.d/apache restart 1>&2
+	fi
 fi
 # apache2
 if [ -d %{_apache2dir}/httpd.conf ]; then
-        ln -sf %{_sysconfdir}/%{name}/apache-%{name}.conf %{_apache2dir}/httpd.conf/99_%{name}.conf
-        if [ -f /var/lock/subsys/httpd ]; then
-                /etc/rc.d/init.d/httpd restart 1>&2
-        fi
+	ln -sf %{_sysconfdir}/%{name}/apache-%{name}.conf %{_apache2dir}/httpd.conf/99_%{name}.conf
+	if [ -f /var/lock/subsys/httpd ]; then
+		/etc/rc.d/init.d/httpd restart 1>&2
+	fi
 fi
 
 %preun
 if [ "$1" = "0" ]; then
-        # apache1
-        if [ -d %{_apache1dir}/conf.d ]; then
-                rm -f %{_apache1dir}/conf.d/99_%{name}.conf
-                if [ -f /var/lock/subsys/apache ]; then
-                        /etc/rc.d/init.d/apache restart 1>&2
-                fi
-        fi
-        # apache2
-        if [ -d %{_apache2dir}/httpd.conf ]; then
-                rm -f %{_apache2dir}/httpd.conf/99_%{name}.conf
-                if [ -f /var/lock/subsys/httpd ]; then
-                        /etc/rc.d/init.d/httpd restart 1>&2
-                fi
-        fi
+	# apache1
+	if [ -d %{_apache1dir}/conf.d ]; then
+		rm -f %{_apache1dir}/conf.d/99_%{name}.conf
+		if [ -f /var/lock/subsys/apache ]; then
+			/etc/rc.d/init.d/apache restart 1>&2
+		fi
+	fi
+	# apache2
+	if [ -d %{_apache2dir}/httpd.conf ]; then
+		rm -f %{_apache2dir}/httpd.conf/99_%{name}.conf
+		if [ -f /var/lock/subsys/httpd ]; then
+			/etc/rc.d/init.d/httpd restart 1>&2
+		fi
+	fi
 fi
 
 %triggerin -- verliadmin = 0.3_RC1
