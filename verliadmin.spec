@@ -1,16 +1,15 @@
-%define		subver RC1
+%define		subver RC2
 Summary:	PHP interface for verlihub
 Summary(pl):	Interfejs php dla verlihub
 Name:		verliadmin
-Version:	0.3_%{subver}
-Release:	1
+Version:	0.3
+Release:	1.%{subver}
 License:	GPL
 Group:		Networking/Admin
-Source0:	http://dl.sourceforge.net/verlihub/VerliAdmin_%{version}.zip
-# Source0-md5:	507a133edf72a4c68ba967dac91b1e76
+Source0:	http://bohyn.czechweb.cz/download/VerliAdmin_%{version}_%{subver}.zip
+# Source0-md5:	7df9d5ba542d5a35f893b2c6e9d2a316
 URL:		http://bohyn.czechweb.cz/
 BuildRequires:	unzip
-BuildRequires:	zip
 Requires:	verlihub = 0.9.7
 Requires:	php
 Requires:	webserver
@@ -30,15 +29,7 @@ Wszystkie warto¶ci konfiguracji s± w bazie MySQL oraz w pliku defaultconf.php.
 W pliku config.php nale¿y ustawiæ parametry po³±czenia z MySQL.
 
 %prep
-%setup -q -n VerliAdmin -cT
-
-# workaround for ugly sources
-cp %{SOURCE0} .
-zip -qF VerliAdmin_%{version}.zip
-unzip -qq VerliAdmin_%{version}.zip -d ..
-find -type d -exec chmod a+x {} \;
-mv -f ../VERLIADMIN/* .
-rm -rf ../VERLIADMIN
+%setup -q -n VerliAdmin
 
 %install
 rm -rf $RPM_BUILD_ROOT
