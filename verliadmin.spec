@@ -10,9 +10,9 @@ Source0:	http://dl.sourceforge.net/verlihub/VerliAdmin_%{version}.zip
 # Source0-md5:	507a133edf72a4c68ba967dac91b1e76
 URL:		http://bohyn.czechweb.cz/
 Requires:	verlihub = 0.9.7
-Requires:       php
-Requires:       webserver
-BuildArch:      noarch
+Requires:	php
+Requires:	webserver
+BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_httpdir	/home/services/httpd/html
@@ -55,4 +55,4 @@ rm -rf $RPM_BUILD_ROOT
 %{_httpdir}/verliadmin/[abdefhiklmrsuv]*.php
 %{_httpdir}/verliadmin/commands.php
 %{_httpdir}/verliadmin/chpass.php
-%attr(640,root,httpd) %verify(not md5 size mtime) %config(noreplace) %{_httpdir}/verliadmin/config.php
+%attr(640,root,http) %verify(not md5 size mtime) %config(noreplace) %{_httpdir}/verliadmin/config.php
