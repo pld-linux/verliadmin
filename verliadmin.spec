@@ -2,7 +2,7 @@ Summary:	PHP interface for verlihub
 Summary(pl):	Interfejs PHP dla verlihub
 Name:		verliadmin
 Version:	0.3
-Release:	1
+Release:	2
 Epoch:		1
 License:	GPL
 Group:		Networking/Admin
@@ -18,6 +18,8 @@ BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_verliadmindir	%{_datadir}/%{name}
+%define		_apache1dir	/etc/apache
+%define		_apache2dir	/etc/httpd
 
 %description
 Verliadmin is administration tool for verlihub written in php.
@@ -46,35 +48,45 @@ install language/* $RPM_BUILD_ROOT%{_verliadmindir}/language
 ln -sf %{_sysconfdir}/verliadmin/config.php $RPM_BUILD_ROOT%{_verliadmindir}/config.php
 
 # for apache
-echo "Alias /verliadmin /usr/share/%{name}" >%{name}.conf
-install %{name}.conf $RPM_BUILD_ROOT%{_sysconfdir}/httpd
+echo "Alias /verliadmin /usr/share/%{name}" >apache-%{name}.conf
+install apache-%{name}.conf $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %post
-if [ -f /etc/httpd/httpd.conf ] && ! grep -q "^Include.*%{name}.conf" /etc/httpd; then
-	echo "Include /etc/httpd/%{name}.conf" >> /etc/httpd/httpd.conf
-elif [ -d /etc/httpd/httpd.conf ]; then
-	ln -sf /etc/httpd/%{name}.conf /etc/httpd/httpd.conf/99_%{name}.conf
+# apache1
+if [ -d %{_apache1dir}/conf.d ]; then
+        ln -sf %{_sysconfdir}/%{name}/apache-%{name}.conf %{_apache1dir}/conf.d/99_%{name}.conf
+        if [ -f /var/lock/subsys/apache ]; then
+                /etc/rc.d/init.d/apache restart 1>&2
+        fi
 fi
-if [ -f /var/lock/subsys/httpd ]; then
-	/usr/sbin/apachectl restart 1>&2
+# apache2
+if [ -d %{_apache2dir}/httpd.conf ]; then
+        ln -sf %{_sysconfdir}/%{name}/apache-%{name}.conf %{_apache2dir}/httpd.conf/99_%{name}.conf
+        if [ -f /var/lock/subsys/httpd ]; then
+                /etc/rc.d/init.d/httpd restart 1>&2
+        fi
 fi
 
 %preun
 if [ "$1" = "0" ]; then
 	umask 027
-	if [ -d /etc/httpd/httpd.conf ]; then
-		rm -f /etc/httpd/httpd.conf/99_%{name}.conf
-	else
-		grep -v "^Include.*%{name}.conf" /etc/httpd/httpd.conf > \
-			/etc/httpd/httpd.conf.tmp
-		mv -f /etc/httpd/httpd.conf.tmp /etc/httpd/httpd.conf
-		if [ -f /var/lock/subsys/httpd ]; then
-			/usr/sbin/apachectl restart 1>&2
-		fi
-	fi
+        # apache1
+        if [ -d %{_apache1dir}/conf.d ]; then
+                rm -f %{_apache1dir}/conf.d/99_%{name}.conf
+                if [ -f /var/lock/subsys/apache ]; then
+                        /etc/rc.d/init.d/apache restart 1>&2
+                fi
+        fi
+        # apache2
+        if [ -d %{_apache2dir}/httpd.conf ]; then
+                rm -f %{_apache2dir}/httpd.conf/99_%{name}.conf
+                if [ -f /var/lock/subsys/httpd ]; then
+                        /etc/rc.d/init.d/httpd restart 1>&2
+                fi
+        fi
 fi
 
 %triggerin -- verliadmin = 0.3_RC1
@@ -86,4 +98,4 @@ mv -f /home/services/httpd/html/verliadmin/config.php %{_sysconfdir}/verliadmin/
 %{_verliadmindir}
 %attr(750,root,http) %dir %{_sysconfdir}/verliadmin/
 %attr(640,root,http) %verify(not md5 size mtime) %config(noreplace) %{_sysconfdir}/verliadmin/config.php
-%config(noreplace) %verify(not size mtime md5) /etc/httpd/%{name}.conf
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/verliadmin/apache-%{name}.conf
