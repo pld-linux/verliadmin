@@ -33,8 +33,9 @@ W pliku config.php nale¿y ustawiæ parametry po³±czenia z MySQL.
 %setup -q -n VerliAdmin -cT
 
 # workaround for ugly sources
-zip -qF %{SOURCE0}
-unzip -qq %{SOURCE0} -d ..
+cp %{SOURCE0} .
+zip -qF VerliAdmin_%{version}.zip
+unzip -qq VerliAdmin_%{version}.zip -d ..
 find -type d -exec chmod a+x {} \;
 mv -f ../VERLIADMIN/* .
 rm -rf ../VERLIADMIN
