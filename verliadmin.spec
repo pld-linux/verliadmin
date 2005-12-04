@@ -11,8 +11,8 @@ Source0:	http://bohyn.czechweb.cz/download/VerliAdmin_%{version}.zip
 Patch0:		%{name}-lang.patch
 URL:		http://bohyn.czechweb.cz/
 BuildRequires:	unzip
-Requires:	verlihub >= 0.9.7
 Requires:	php
+Requires:	verlihub >= 0.9.7
 Requires:	webserver
 BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -22,14 +22,16 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_apache2dir	/etc/httpd
 
 %description
-Verliadmin is administration tool for verlihub written in php.
-All configuration values are in MySQL database and in defaultconf.php.
-In config.php you must setup MySQL connection. Everyting else is predefined.
+Verliadmin is administration tool for verlihub written in php. All
+configuration values are in MySQL database and in defaultconf.php. In
+config.php you must setup MySQL connection. Everyting else is
+predefined.
 
 %description -l pl
-Verliadmin jest narzêdziem administracyjnym dla verlihuba napisanym w php.
-Wszystkie warto¶ci konfiguracji s± w bazie MySQL oraz w pliku defaultconf.php.
-W pliku config.php nale¿y ustawiæ parametry po³±czenia z MySQL.
+Verliadmin jest narzêdziem administracyjnym dla verlihuba napisanym w
+php. Wszystkie warto¶ci konfiguracji s± w bazie MySQL oraz w pliku
+defaultconf.php. W pliku config.php nale¿y ustawiæ parametry
+po³±czenia z MySQL.
 
 %prep
 %setup -q -n VerliAdmin
@@ -96,5 +98,5 @@ mv -f /home/services/httpd/html/verliadmin/config.php %{_sysconfdir}/verliadmin/
 %doc readme.txt scripts/*.sql
 %{_verliadmindir}
 %attr(750,root,http) %dir %{_sysconfdir}/verliadmin/
-%attr(640,root,http) %verify(not md5 size mtime) %config(noreplace) %{_sysconfdir}/verliadmin/config.php
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/verliadmin/apache-%{name}.conf
+%attr(640,root,http) %verify(not md5 mtime size) %config(noreplace) %{_sysconfdir}/verliadmin/config.php
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/verliadmin/apache-%{name}.conf
