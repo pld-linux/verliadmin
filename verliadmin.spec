@@ -2,7 +2,7 @@ Summary:	PHP interface for verlihub
 Summary(pl):	Interfejs PHP dla verlihub
 Name:		verliadmin
 Version:	0.3
-Release:	2
+Release:	3
 Epoch:		1
 License:	GPL
 Group:		Networking/Admin
@@ -10,16 +10,20 @@ Source0:	http://bohyn.czechweb.cz/download/VerliAdmin_%{version}.zip
 # Source0-md5:	6f39fd52150c6218dc20e115a65a08a4
 Patch0:		%{name}-lang.patch
 URL:		http://bohyn.czechweb.cz/
+BuildRequires:	rpmbuild(macros) >= 1.264
+BuildRequires:	sed >= 4.0
 BuildRequires:	unzip
 Requires:	php
 Requires:	verlihub >= 0.9.7
+Requires:	webapps
 Requires:	webserver
 BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_verliadmindir	%{_datadir}/%{name}
-%define		_apache1dir	/etc/apache
-%define		_apache2dir	/etc/httpd
+%define		_webapps	/etc/webapps
+%define		_webapp		%{name}
+%define		_sysconfdir	%{_webapps}/%{_webapp}
 
 %description
 Verliadmin is administration tool for verlihub written in php. All
@@ -37,66 +41,98 @@ po³±czenia z MySQL.
 %setup -q -n VerliAdmin
 %patch0 -p1
 
+# undos the source
+find . -type f -print0 | xargs -0 sed -i -e 's,\r$,,'
+
+cat <<'EOF' > apache.conf
+Alias /verliadmin %{_datadir}/%{name}
+# vim: filetype=apache ts=4 sw=4 et
+EOF
+
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{_verliadmindir}/{img,language},%{_sysconfdir}/{verliadmin,httpd}}
+install -d $RPM_BUILD_ROOT{%{_verliadmindir}/{img,language},%{_sysconfdir}}
 
 install favicon.ico $RPM_BUILD_ROOT%{_verliadmindir}
 install default.css $RPM_BUILD_ROOT%{_verliadmindir}
-mv config.php $RPM_BUILD_ROOT%{_sysconfdir}/verliadmin
+mv config.php $RPM_BUILD_ROOT%{_sysconfdir}
 install *.php $RPM_BUILD_ROOT%{_verliadmindir}
 install img/* $RPM_BUILD_ROOT%{_verliadmindir}/img
 install language/* $RPM_BUILD_ROOT%{_verliadmindir}/language
-ln -sf %{_sysconfdir}/verliadmin/config.php $RPM_BUILD_ROOT%{_verliadmindir}/config.php
+ln -sf %{_sysconfdir}/config.php $RPM_BUILD_ROOT%{_verliadmindir}/config.php
 
 # for apache
-echo "Alias /verliadmin /usr/share/%{name}" > apache-%{name}.conf
-install apache-%{name}.conf $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
+install apache.conf $RPM_BUILD_ROOT%{_sysconfdir}/apache.conf
+install apache.conf $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%post
-# apache1
-if [ -d %{_apache1dir}/conf.d ]; then
-	ln -sf %{_sysconfdir}/%{name}/apache-%{name}.conf %{_apache1dir}/conf.d/99_%{name}.conf
-	if [ -f /var/lock/subsys/apache ]; then
-		/etc/rc.d/init.d/apache restart 1>&2
-	fi
+%triggerin -- apache1
+%webapp_register apache %{_webapp}
+
+%triggerun -- apache1
+%webapp_unregister apache %{_webapp}
+
+%triggerin -- apache >= 2.0.0
+%webapp_register httpd %{_webapp}
+
+%triggerun -- apache >= 2.0.0
+%webapp_unregister httpd %{_webapp}
+
+%triggerin -- verliadmin < 1:0.3-2.1
+# rescue app config
+if [ -f /home/servicves/httpd/html/verliadmin/config.php.rpmsave ]; then
+	mv -f %{_sysconfdir}/config.php{,.rpmnew}
+	mv -f /home/servicves/httpd/html/verliadmin/config.php.rpmsave %{_sysconfdir}/config.php
 fi
-# apache2
-if [ -d %{_apache2dir}/httpd.conf ]; then
-	ln -sf %{_sysconfdir}/%{name}/apache-%{name}.conf %{_apache2dir}/httpd.conf/99_%{name}.conf
+if [ -f /etc/%{name}/config.php.rpmsave ]; then
+	mv -f %{_sysconfdir}/config.php{,.rpmnew}
+	mv -f /etc/%{name}/config.php.rpmsave %{_sysconfdir}/config.php
+fi
+
+# migrate from apache-config macros
+if [ -f /etc/%{name}/apache-%{name}.conf.rpmsave ]; then
+	if [ -d /etc/apache/webapps.d ]; then
+		cp -f %{_sysconfdir}/apache.conf{,.rpmnew}
+		cp -f /etc/%{name}/apache-%{name}.conf.rpmsave %{_sysconfdir}/apache.conf
+	fi
+
+	if [ -d /etc/httpd/webapps.d ]; then
+		cp -f %{_sysconfdir}/httpd.conf{,.rpmnew}
+		cp -f /etc/%{name}/apache-%{name}.conf.rpmsave %{_sysconfdir}/httpd.conf
+	fi
+	rm -f /etc/%{name}/apache-%{name}.conf.rpmsave
+fi
+
+# migrating from earlier apache-config?
+if [ -L /etc/apache/conf.d/99_%{name}.conf ]; then
+	rm -f /etc/apache/conf.d/99_%{name}.conf
+	apache_reload=1
+fi
+if [ -L /etc/httpd/httpd.conf/99_%{name}.conf ]; then
+	rm -f /etc/httpd/httpd.conf/99_%{name}.conf
+	httpd_reload=1
+fi
+
+if [ "$httpd_reload" ]; then
+	/usr/sbin/webapp register httpd %{_webapp}
 	if [ -f /var/lock/subsys/httpd ]; then
-		/etc/rc.d/init.d/httpd restart 1>&2
+		/etc/rc.d/init.d/httpd reload 1>&2
 	fi
 fi
-
-%preun
-if [ "$1" = "0" ]; then
-	# apache1
-	if [ -d %{_apache1dir}/conf.d ]; then
-		rm -f %{_apache1dir}/conf.d/99_%{name}.conf
-		if [ -f /var/lock/subsys/apache ]; then
-			/etc/rc.d/init.d/apache restart 1>&2
-		fi
-	fi
-	# apache2
-	if [ -d %{_apache2dir}/httpd.conf ]; then
-		rm -f %{_apache2dir}/httpd.conf/99_%{name}.conf
-		if [ -f /var/lock/subsys/httpd ]; then
-			/etc/rc.d/init.d/httpd restart 1>&2
-		fi
+if [ "$apache_reload" ]; then
+	/usr/sbin/webapp register apache %{_webapp}
+	if [ -f /var/lock/subsys/apache ]; then
+		/etc/rc.d/init.d/apache reload 1>&2
 	fi
 fi
-
-%triggerin -- verliadmin = 0.3_RC1
-mv -f /home/services/httpd/html/verliadmin/config.php %{_sysconfdir}/verliadmin/config.php
 
 %files
 %defattr(644,root,root,755)
 %doc readme.txt scripts/*.sql
+%dir %attr(750,root,http) %{_sysconfdir}
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/apache.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf
+%attr(640,root,http) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/config.php
 %{_verliadmindir}
-%attr(750,root,http) %dir %{_sysconfdir}/verliadmin/
-%attr(640,root,http) %verify(not md5 mtime size) %config(noreplace) %{_sysconfdir}/verliadmin/config.php
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/verliadmin/apache-%{name}.conf
