@@ -2,7 +2,7 @@ Summary:	PHP interface for verlihub
 Summary(pl):	Interfejs PHP dla verlihub
 Name:		verliadmin
 Version:	0.3
-Release:	3
+Release:	4
 Epoch:		1
 License:	GPL
 Group:		Networking/Admin
