@@ -47,9 +47,8 @@ find . -type f -print0 | xargs -0 sed -i -e 's,\r$,,'
 cat <<'EOF' > apache.conf
 Alias /verliadmin %{_datadir}/%{name}
 <Directory %{_datadir}/%{name}>
-    Allow from all
+	Allow from all
 </Directory>
-# vim: filetype=apache ts=4 sw=4 et
 EOF
 
 %install
