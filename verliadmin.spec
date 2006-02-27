@@ -2,7 +2,7 @@ Summary:	PHP interface for verlihub
 Summary(pl):	Interfejs PHP dla verlihub
 Name:		verliadmin
 Version:	0.3
-Release:	4
+Release:	5
 Epoch:		1
 License:	GPL
 Group:		Networking/Admin
@@ -46,6 +46,9 @@ find . -type f -print0 | xargs -0 sed -i -e 's,\r$,,'
 
 cat <<'EOF' > apache.conf
 Alias /verliadmin %{_datadir}/%{name}
+<Directory %{_datadir}/%{name}>
+    Allow from all
+</Directory>
 # vim: filetype=apache ts=4 sw=4 et
 EOF
 
