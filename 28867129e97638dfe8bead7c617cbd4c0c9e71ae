@@ -1,0 +1,2 @@
+- R: php, webserver; BuildArch: noarch
+- %files fixes (%config config.php)
