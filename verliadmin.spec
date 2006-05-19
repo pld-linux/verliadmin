@@ -2,7 +2,7 @@ Summary:	PHP interface for verlihub
 Summary(pl):	Interfejs PHP dla verlihub
 Name:		verliadmin
 Version:	0.3
-Release:	5
+Release:	6
 Epoch:		1
 License:	GPL
 Group:		Networking/Admin
@@ -10,7 +10,7 @@ Source0:	http://bohyn.czechweb.cz/download/VerliAdmin_%{version}.zip
 # Source0-md5:	6f39fd52150c6218dc20e115a65a08a4
 Patch0:		%{name}-lang.patch
 URL:		http://bohyn.czechweb.cz/
-BuildRequires:	rpmbuild(macros) >= 1.264
+BuildRequires:	rpmbuild(macros) >= 1.268
 BuildRequires:	sed >= 4.0
 BuildRequires:	unzip
 Requires:	php
@@ -119,15 +119,11 @@ fi
 
 if [ "$httpd_reload" ]; then
 	/usr/sbin/webapp register httpd %{_webapp}
-	if [ -f /var/lock/subsys/httpd ]; then
-		/etc/rc.d/init.d/httpd reload 1>&2
-	fi
+	%service -q httpd reload
 fi
 if [ "$apache_reload" ]; then
 	/usr/sbin/webapp register apache %{_webapp}
-	if [ -f /var/lock/subsys/apache ]; then
-		/etc/rc.d/init.d/apache reload 1>&2
-	fi
+	%service -q apache reload
 fi
 
 %files
