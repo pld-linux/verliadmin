@@ -2,7 +2,7 @@ Summary:	PHP interface for verlihub
 Summary(pl):	Interfejs PHP dla verlihub
 Name:		verliadmin
 Version:	0.3
-Release:	7
+Release:	8
 Epoch:		1
 License:	GPL
 Group:		Networking/Admin
@@ -13,10 +13,10 @@ URL:		http://bohyn.czechweb.cz/
 BuildRequires:	rpmbuild(macros) >= 1.268
 BuildRequires:	sed >= 4.0
 BuildRequires:	unzip
-Requires:	php
 Requires:	verlihub >= 0.9.7
 Requires:	webapps
 Requires:	webserver
+Requires:	webserver(php)
 BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
