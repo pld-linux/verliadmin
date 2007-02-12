@@ -1,5 +1,5 @@
 Summary:	PHP interface for verlihub
-Summary(pl):	Interfejs PHP dla verlihub
+Summary(pl.UTF-8):   Interfejs PHP dla verlihub
 Name:		verliadmin
 Version:	0.3
 Release:	8
@@ -31,11 +31,11 @@ configuration values are in MySQL database and in defaultconf.php. In
 config.php you must setup MySQL connection. Everyting else is
 predefined.
 
-%description -l pl
-Verliadmin jest narzêdziem administracyjnym dla verlihuba napisanym w
-php. Wszystkie warto¶ci konfiguracji s± w bazie MySQL oraz w pliku
-defaultconf.php. W pliku config.php nale¿y ustawiæ parametry
-po³±czenia z MySQL.
+%description -l pl.UTF-8
+Verliadmin jest narzÄ™dziem administracyjnym dla verlihuba napisanym w
+php. Wszystkie wartoÅ›ci konfiguracji sÄ… w bazie MySQL oraz w pliku
+defaultconf.php. W pliku config.php naleÅ¼y ustawiÄ‡ parametry
+poÅ‚Ä…czenia z MySQL.
 
 %prep
 %setup -q -n VerliAdmin
