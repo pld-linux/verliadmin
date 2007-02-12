@@ -1,5 +1,5 @@
 Summary:	PHP interface for verlihub
-Summary(pl.UTF-8):   Interfejs PHP dla verlihub
+Summary(pl.UTF-8):	Interfejs PHP dla verlihub
 Name:		verliadmin
 Version:	0.3
 Release:	8
