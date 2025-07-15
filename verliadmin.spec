@@ -39,7 +39,7 @@ połączenia z MySQL.
 
 %prep
 %setup -q -n VerliAdmin
-%patch0 -p1
+%patch -P0 -p1
 
 # undos the source
 find . -type f -print0 | xargs -0 sed -i -e 's,\r$,,'
